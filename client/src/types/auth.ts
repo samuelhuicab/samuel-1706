@@ -1,13 +1,13 @@
-export interface Users{
+export interface User{
     userId: string;
     name: string;
     email: string;
-    password: string;
+    passwordHash: string;
     balance: number;
     createdAt: string;
 }
 
-export interface Sessions{
+export interface Session{
     userId: string;
     createdAt: string;
 }

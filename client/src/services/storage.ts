@@ -1,4 +1,4 @@
-import type { Users, Sessions } from '../types/auth';
+import type { User, Session } from '../types/auth';
 
 const STORAGE_USERS_KEY = {
     USERS: 'caracol.users',
@@ -6,38 +6,38 @@ const STORAGE_USERS_KEY = {
 } as const; 
 
 // Obtengo todos los usuarios del localStorage
-export function getUsers(): Users[]{
+export function getUsers(): User[]{
     const users = localStorage.getItem(STORAGE_USERS_KEY.USERS);
     
     if (!users) return [];
 
     try {
-        return JSON.parse(users) as Users[];
+        return JSON.parse(users) as User[];
     } catch (error) {
         return [];
     }
 }
 
 // Obtengo la sesión del localStorage
-export function getSession(): Sessions | null{
+export function getSession(): Session | null{
     const session = localStorage.getItem(STORAGE_USERS_KEY.SESSION);
 
     if (!session) return null;
 
     try {
-        return JSON.parse(session) as Sessions;
+        return JSON.parse(session) as Session;
     } catch (error) {
         return null;
     }
 }
 
 // Almaceno todos los usuarios en el localStrorage
-export function saveUsers(users: Users[]): void{
+export function saveUsers(users: User[]): void{
     localStorage.setItem(STORAGE_USERS_KEY.USERS, JSON.stringify(users));
 }
 
 // Almaceno la sesión en el localStorage
-export function saveSession(session: Sessions): void{
+export function saveSession(session: Session): void{
     localStorage.setItem(STORAGE_USERS_KEY.SESSION, JSON.stringify(session));
 }
 
