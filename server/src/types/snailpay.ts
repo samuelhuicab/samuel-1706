@@ -1,3 +1,6 @@
+import type { z } from 'zod';
+import type { chargeRequestSchema } from '../validation/snailpay.schema';
+
 export type ChargeStatus = 'approved' | 'rejected' | 'error';
 
 export type ChargeStatusDetail =
@@ -10,15 +13,8 @@ export type ChargeStatusDetail =
   | 'service_unavailable'
   | 'gateway_timeout';
 
-export interface ChargeRequest {
-  card_number: string;
-  expiration_date: string;
-  cvv: string;
-  cardholder_name: string;
-  amount: number;
-  payer_id: string;
-  payer_email: string;
-}
+
+export type ChargeRequest = z.infer<typeof chargeRequestSchema>;
 
 export interface ChargeResponse {
   id: string;
