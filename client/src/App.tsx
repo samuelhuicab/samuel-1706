@@ -1,23 +1,18 @@
-import { useAuth } from './context/AuthContext'
+import { Routes, Route, Navigate } from 'react-router';
+import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+
 
 function App() {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <p>Cargando...</p>;
-  }
-
   return (
-    <>
-      {user ? (
-        <h1>Bienvenido {user ? user.name : 'Sin sesión'}</h1>
-      ) : (
-        <RegisterPage/>
-      )}
-    </>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
-  
 }
 
 export default App
