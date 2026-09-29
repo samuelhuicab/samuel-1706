@@ -20,7 +20,7 @@ function TextField({ id, label, error, ...inputProps }: TextFieldProps) {
         {...inputProps}
       />
 
-      {error && <p className="text-error text-sm mt-1">{error}</p>}
+      {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
     </div>
   );
 }

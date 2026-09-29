@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from '../context/AuthContext';
 import TextField from "../components/ui/TextField";
+import { validateRegisterForm, type RegisterFormErrors } from "../utils/validation";
 
 function RegisterPage(){
     const { register } = useAuth();
@@ -12,6 +13,7 @@ function RegisterPage(){
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<RegisterFormErrors>({});
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -19,8 +21,11 @@ function RegisterPage(){
         setSubmitError(null);
         setIsSubmitting(true);
         try {
-            if (name == "" && email == "" && password == "" && confirmPassword == ""){
-                throw Error("Completa todos los campos por favor.");
+            const validationErrors = validateRegisterForm({ name, email, password, confirmPassword });
+            setErrors(validationErrors);
+
+            if (Object.keys(validationErrors).length > 0) {
+                return;
             }
             
             await register(name, email, password);
@@ -44,10 +49,10 @@ function RegisterPage(){
                     </div>
                 )}
 
-                <TextField id="name" label="Nombre completo" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-                <TextField id="email" label="Correo Electrónico" value={email} type="email" onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-                <TextField id="password" placeholder="********" label="Contraseña" value={password} type="password" onChange={(e) => setPassword(e.target.value)} />
-                <TextField id="confirmPassword" placeholder="********" label="Confirmar Contraseña" value={confirmPassword} type="password" onChange={(e) => setConfirmPassword(e.target.value)} />                    
+                <TextField id="name" label="Nombre completo" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" error={errors.name} />
+                <TextField id="email" label="Correo electrónico" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" error={errors.email} />
+                <TextField id="password" label="Contraseña" type="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" error={errors.password} />
+                <TextField id="confirmPassword" label="Confirmar contraseña" type="password" placeholder="********" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" error={errors.confirmPassword} />                 
 
                 <button type="submit" className="px-4 py-2 bg-black text-white rounded-2xl cursor-pointer hover:bg-mist-900 transition-colors" disabled={isSubmitting}>
                     {isSubmitting ? 'Creando cuenta...' : 'Registrarme'}
