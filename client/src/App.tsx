@@ -1,4 +1,5 @@
 import { useAuth } from './context/AuthContext'
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -9,8 +10,11 @@ function App() {
 
   return (
     <>
-      <h1>Bienvenido {user ? user.name : 'Sin sesión'}</h1>;
-      <button className="btn btn-primary">Prueba</button>
+      {user ? (
+        <h1>Bienvenido {user ? user.name : 'Sin sesión'}</h1>
+      ) : (
+        <RegisterPage/>
+      )}
     </>
   );
   

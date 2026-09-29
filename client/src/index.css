@@ -1,2 +1,13 @@
 @import "tailwindcss";
-@plugin "daisyui";
+
+.form-input {
+    @apply w-full px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-gray-100 focus:border-gray-600 text-black placeholder-gray-400 transition-colors;
+}
+
+.form-label {
+    @apply font-semibold text-sm;
+}
+
+.alert-error{
+    @apply bg-red-50 text-sm p-3 rounded-md flex gap-3 border border-red-100 flex-col sm:items-center sm:flex-row dark:bg-red-900/20 dark:border-red-800/40;
+}
