@@ -21,7 +21,7 @@ export const TEST_CARDS = {
   DECLINED: '4000000000000002',
 } as const;
 
-export const TIMEOUT_DELAY_MS = 10_000;
+const DEFAULT_TIMEOUT_DELAY_MS = 5_000;
 
 export interface ChargeResult {
   httpStatus: number;
@@ -38,6 +38,10 @@ interface BuildResultParams {
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getTimeoutDelayMs(): number {
+  return Number(process.env.SNAILPAY_TIMEOUT_MS ?? DEFAULT_TIMEOUT_DELAY_MS);
 }
 
 function generateAuthorizationCode(): string {
@@ -110,7 +114,7 @@ export async function processCharge(body: unknown): Promise<ChargeResult> {
 
     if (request.card_number === TEST_CARDS.TIMEOUT) {
 
-        await wait(TIMEOUT_DELAY_MS);
+        await wait(getTimeoutDelayMs());
 
         return buildResult({
             httpStatus: 504, 
