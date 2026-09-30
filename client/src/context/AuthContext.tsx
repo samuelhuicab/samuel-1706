@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { User } from '../types/auth';
 import { registerUser, loginUser, logoutUser, getCurrentUser } from '../services/auth';
+import { processRecharge, type CardDetails } from '../services/recharge';
+import type { ChargeResponse } from '../types/snailpay';
 
 interface AuthContextValue {
     user: User | null;
@@ -8,6 +10,7 @@ interface AuthContextValue {
     register: (name: string, email: string, password: string) => Promise<void>;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    recharge: (card: CardDetails) => Promise<ChargeResponse>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,8 +40,22 @@ export function AuthProvider({ children }: {children: ReactNode}) {
         setUser(null);
     };
 
+    const recharge = async (card: CardDetails): Promise<ChargeResponse> => {
+        if (!user) {
+            throw new Error('Necesitas iniciar sesión para recargar saldo.');
+        }
+
+        const { response, updatedUser } = await processRecharge(user, card);
+
+        if (updatedUser) {
+            setUser(updatedUser);
+        }
+
+        return response;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, isLoading, register, login, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, register, login, logout, recharge }}>
             {children}
         </AuthContext.Provider>
     );

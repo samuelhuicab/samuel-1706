@@ -1,11 +1,13 @@
 import type { User, Session } from '../types/auth';
 import type { BetStats, RaceDay } from '../types/dashboard';
+import type { ChargeResponse } from '../types/snailpay';
 
 const STORAGE_KEYS = {
     USERS: 'caracol.users',
     SESSION: 'caracol.session',
     RACE_DAY: 'caracol.race',
-    BETS: 'caracol.bets'
+    BETS: 'caracol.bets',
+    TRANSACTIONS: 'caracol.transactions'
 } as const;
 
 
@@ -86,3 +88,24 @@ export function getAllBetStats(): Record<string, BetStats> {
 export function saveAllBetStats(bets: Record<string, BetStats>): void {
     localStorage.setItem(STORAGE_KEYS.BETS, JSON.stringify(bets));
 } 
+
+
+
+
+// PARTE DE LAS TRANSACCIONES
+
+export function getTransactions(): ChargeResponse[]{
+    const transactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+    
+    if (!transactions) return [];
+
+    try {
+        return JSON.parse(transactions) as ChargeResponse[];
+    } catch (error) {
+        return [];
+    }
+}
+
+export function saveTransactions(transactions: ChargeResponse[]): void{
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
+}
