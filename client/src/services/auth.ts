@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import type {User} from '../types/auth';
+import type { User } from '../types/auth';
 import { getUsers, saveUsers, saveSession, removeSession, getSession } from './storage';
 const INVALID_CREDENTIALS_ERROR = 'Usuario o contraseña incorrectos. Por favor, verifica tus credenciales e inténtalo nuevamente.';
 

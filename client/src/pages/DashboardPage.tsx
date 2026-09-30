@@ -1,53 +1,76 @@
-import { useState, type FormEvent } from "react";
+import { useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
-import TextField from "../components/ui/TextField";
+import { getOrCreateRaceDay, getOrCreateBetStats } from '../services/dashboard';
+import { countWins, SNAIL_NAMES } from '../utils/simulation';
+import { formatCurrency } from '../utils/format';
+import Card from '../components/ui/Card';
+import BetsDonutChart from '../components/charts/BetsDonutChart';
+import SnailWinsBarChart from '../components/charts/SnailWinsBarChart';
 
-function DashboardPage(){
+function DashboardPage() {
+  const { user, logout } = useAuth();
 
-    const { login } = useAuth();
+  // Hooks: todos antes de cualquier return
+  const raceDay = useMemo(() => getOrCreateRaceDay(), []);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const snailResults = useMemo(
+    () => countWins(SNAIL_NAMES, raceDay.winners),
+    [raceDay]
+  );
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
+  const betStats = useMemo(
+    () => (user ? getOrCreateBetStats(user.userId, raceDay.winners) : null),
+    [user, raceDay]
+  );
 
+  if (!user || !betStats) return null;
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <span className="text-lg font-semibold">Snail Casa de apuestas</span>
 
-        setSubmitError(null);
-        setIsSubmitting(true);
-        try {
-            await login(email, password);
-        } catch (error) {
-            setSubmitError(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
+          <div className="flex items-center gap-4">
+            <span className="hidden text-sm text-gray-600 sm:inline">
+              Hola, <strong>{user.name}</strong>
+            </span>
+            <button
+              type="button"
+              onClick={logout}
+              className="rounded-xl border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </header>
 
+      <main className="mx-auto grid max-w-5xl gap-4 p-4">
+        <Card title="Saldo actual">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <p className="text-4xl font-bold">{formatCurrency(user.balance)}</p>
+            <button
+              type="button"
+              className="rounded-2xl bg-black px-4 py-2 text-white hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              Recargar saldo
+            </button>
+          </div>
+        </Card>
 
-    return (
-        <main className="min-h-screen grid place-items-center p-4">
-            <form className="grid grid-cols-1 gap-4 w-md max-w-md" onSubmit={handleSubmit}>
-                <h2 className="text-2xl col-span-1">Inicio de sesión</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Card title="Mis apuestas del día">
+                <BetsDonutChart stats={betStats} />
+            </Card>
 
-                {submitError && (
-                    <div role="alert" className="alert-error">
-                    {submitError}
-                    </div>
-                )}
-
-                <TextField id="email" label="Correo electrónico" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-                <TextField id="password" label="Contraseña" type="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)}/>               
-
-                <button type="submit" className="px-4 py-2 bg-black text-white rounded-2xl cursor-pointer hover:bg-mist-900 transition-colors" disabled={isSubmitting}>
-                    {isSubmitting ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
-                </button> 
-            </form>
-        </main>
-    );
+            <Card title="Victorias por caracol (6 carreras)">
+                <SnailWinsBarChart results={snailResults} />
+            </Card>
+        </div>
+      </main>
+    </div>
+  );
 }
 
 export default DashboardPage;
