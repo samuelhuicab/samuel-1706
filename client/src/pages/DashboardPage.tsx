@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getOrCreateRaceDay, getOrCreateBetStats } from '../services/dashboard';
 import { countWins, SNAIL_NAMES } from '../utils/simulation';
@@ -6,6 +6,7 @@ import { formatCurrency } from '../utils/format';
 import Card from '../components/ui/Card';
 import BetsDonutChart from '../components/charts/BetsDonutChart';
 import SnailWinsBarChart from '../components/charts/SnailWinsBarChart';
+import RechargeForm from '../components/recharge/RechargeForm';
 
 function DashboardPage() {
   const { user, logout } = useAuth();
@@ -24,6 +25,8 @@ function DashboardPage() {
   );
 
   if (!user || !betStats) return null;
+
+  const [isRechargeOpen, setIsRechargeOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,12 +55,16 @@ function DashboardPage() {
             <p className="text-4xl font-bold">{formatCurrency(user.balance)}</p>
             <button
               type="button"
+              onClick={() => setIsRechargeOpen(isOpen => !isOpen)}
+              aria-expanded={isRechargeOpen}
               className="rounded-2xl bg-black px-4 py-2 text-white hover:bg-gray-800 transition-colors cursor-pointer"
             >
-              Recargar saldo
+              {isRechargeOpen ? 'Ocultar recarga' : 'Recargar saldo'}
             </button>
           </div>
         </Card>
+
+        {isRechargeOpen && <RechargeForm onClose={() => setIsRechargeOpen(false)} />}
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Card title="Mis apuestas del día">

@@ -1,3 +1,5 @@
+import { formatCurrency } from "./format";
+
 export interface RegisterFormValues {
   name: string;
   email: string;
@@ -12,9 +14,26 @@ export interface RegisterFormErrors {
   confirmPassword?: string;
 }
 
+export interface RechargeFormValues {
+  cardholderName: string;
+  cardNumber: string;
+  expirationDate: string;
+  cvv: string;
+  amount: string;
+}
+
+export interface RechargeFormErrors {
+  cardholderName?: string;
+  cardNumber?: string;
+  expirationDate?: string;
+  cvv?: string;
+  amount?: string;
+}
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_NAME_LENGTH = 3;
 const MIN_PASSWORD_LENGTH = 8;
+const MAX_AMOUNT = 10000;
 
 export function validateRegisterForm(values: RegisterFormValues): RegisterFormErrors {
   const errors: RegisterFormErrors = {};
@@ -46,6 +65,37 @@ export function validateRegisterForm(values: RegisterFormValues): RegisterFormEr
   } else if (values.confirmPassword !== values.password) {
     errors.confirmPassword = 'Las contraseñas no coinciden.';
   }
+
+  return errors;
+}
+
+export function validateRechargeForm(values: RechargeFormValues): RechargeFormErrors {
+  const errors: RechargeFormErrors = {};
+
+  if (!values.cardholderName.trim()){
+    errors.cardholderName = 'El nombre de la tajeta no debe estar vacío.';
+  }
+
+  if (!/^\d{16}$/.test(values.cardNumber.replace(/\s/g, ''))){
+    errors.cardNumber = 'El número de tarjeta debe tener 16 dígitos.';
+  }
+
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expirationDate.trim())){
+    errors.expirationDate = 'La fecha de vencimiento debe tener el formato MM/AA.'
+  }
+
+  if (!/^\d{3}$/.test(values.cvv.trim())){
+    errors.cvv = 'El CVV debe tener 3 dígitos.';
+  }
+  
+  const amount = Number(values.amount);
+
+  if (!/^\d+(\.\d{1,2})?$/.test(values.amount.trim()) || amount <= 0) {
+    errors.amount = 'Escribe un monto mayor que cero, con máximo dos decimales.';
+  } else if (amount > MAX_AMOUNT) {
+    errors.amount = `El monto máximo por recarga es de ${formatCurrency(MAX_AMOUNT)}.`;
+  }
+
 
   return errors;
 }
